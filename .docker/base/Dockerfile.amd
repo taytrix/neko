@@ -5,6 +5,14 @@ FROM golang:1.20-bullseye as server
 WORKDIR /src
 
 #
+# Branded image
+#
+
+ARG BRANCH=custom-branding
+RUN git checkout ${BRANCH}
+
+
+#
 # install dependencies
 RUN set -eux; apt-get update; \
     apt-get install -y --no-install-recommends git cmake make libx11-dev libxrandr-dev libxtst-dev \
