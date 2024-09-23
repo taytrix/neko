@@ -107,6 +107,21 @@ build_nvidia() {
   fi
 }
 
+build_amd() {
+  if [ "$1" = "base" ]
+  then
+    # build amd base
+    docker build -t "${BUILD_IMAGE}:amd-base" -f base/Dockerfile.amd "${BASE}"
+  elif [ -f "$1/Dockerfile.amd" ]
+  then
+    # build dedicated amd image
+    docker build -t "${BUILD_IMAGE}:amd-$1" --build-arg="BASE_IMAGE=${BUILD_IMAGE}:amd-base" -f "$1/Dockerfile.amd" "$1/"
+  else
+    # try to build amd image with common Dockerfile
+    docker build -t "${BUILD_IMAGE}:amd-$1" --build-arg="BASE_IMAGE=${BUILD_IMAGE}:amd-base" -f "$1/Dockerfile" "$1/"
+  fi
+}
+
 case $1 in
   client) build_client;;
   server) build_server;;
@@ -119,6 +134,9 @@ case $1 in
 
   # build nvidia- images
   nvidia-*) build_nvidia "${1#nvidia-}";;
+
+  # build amd- images
+  amd-*) build_amd "${1#amd-}";;
 
   # build images
   *) build "$1";;

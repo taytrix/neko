@@ -29,6 +29,12 @@ if [[ "${SERVER_TAG}" == "intel-"* ]]; then
   echo "Intel GPU acceleration enabled"
 fi
 
+# if image starts with amd- add --device /dev/dri
+if [[ "${SERVER_TAG}" == "amd-"* ]]; then
+  GPU_FLAG="--device /dev/dri"
+  echo "AMD GPU acceleration enabled"
+fi
+
 # use --gpus all to enable GPU acceleration
 docker run --rm -it \
   --name "neko_dev" \

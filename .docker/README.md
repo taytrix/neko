@@ -16,6 +16,13 @@ If you want, you can build other tags. `base` tag needs to be build first:
 - `./build google-chrome`
 - etc...
 
+- For AMD-optimized versions:
+  - `./build amd-base`
+  - `./build amd-firefox`
+  - `./build amd-chromium`
+  - `./build amd-google-chrome`
+  - etc...
+
 ## Step 2: Starting server
 
 - `./start-server` - Starting server image you specified in `.env`.
