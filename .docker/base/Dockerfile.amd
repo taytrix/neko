@@ -70,7 +70,7 @@ RUN set -eux; \
         libxrandr2 \
         libxv1 \
         libopus0 \
-        libvpx6 \
+        libvpx7 \
         mesa-va-drivers \
         vainfo \
         gstreamer1.0-plugins-base \
