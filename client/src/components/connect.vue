@@ -2,7 +2,7 @@
   <div class="connect">
     <div class="window">
       <div class="logo">
-        <span><b>dix</b></span>
+        <span><b>dix</b>scape</span>
       </div>
       <form class="message" v-if="!connecting" @submit.stop.prevent="connect">
         <span v-if="!autoPassword">{{ $t('connect.login_title') }}</span>
