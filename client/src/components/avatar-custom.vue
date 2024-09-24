@@ -32,13 +32,13 @@
       const name = this.seed.toLowerCase()
       switch (name) {
         case 'tay':
-          return 'images/avatars/tay.jpg'
+          return require('@/assets/images/avatars/tay.jpg')
         case 'v':
-          return '@/assets/images/avatars/v.jpg'
+          return require('@/assets/images/avatars/v.jpg')
         case 'olive':
-          return '@/assets/images/avatars/olive.jpg'
+          return require('@/assets/images/avatars/olive.jpg')
         case 'troy':
-          return 'https://browse.dix.lol/images/avatars/troy.jpg'
+          return require('@/assets/images/avatars/troy.jpg')
         default:
           return null
       }
