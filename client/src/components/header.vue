@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <a href="#" title="" target="_blank" class="neko">
-      <img src="@/assets/images/logo.svg" alt="dix" />
+      <img src="@/assets/images/logo.png" alt="dix" />
       <span><b>dix</b></span>
     </a>
     <ul class="menu">
