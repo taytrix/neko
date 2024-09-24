@@ -22,8 +22,8 @@
   
   // Import custom avatar images
   import tayAvatar from '@/assets/images/avatars/tay.jpg'
-  import vAvatar from '@/assets/images/avatars/v.png'
-  import oliveAvatar from '@/assets/images/avatars/olive.png'
+  import vAvatar from '@/assets/images/avatars/v.jpg'
+  import oliveAvatar from '@/assets/images/avatars/olive.jpg'
   import troyAvatar from '@/assets/images/avatars/troy.jpg'
   
   @Component({
