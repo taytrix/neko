@@ -1,6 +1,6 @@
 <template>
   <ul>
-    <li><i @click.stop.prevent="about" class="fas fa-question-circle" /></li>
+    <!-- <li><i @click.stop.prevent="about" class="fas fa-question-circle" /></li>
     <li>
       <i
         class="fas fa-shield-alt"
@@ -12,7 +12,7 @@
         }"
         v-if="admin"
       />
-    </li>
+    </li> -->
     <li>
       <select v-model="$i18n.locale">
         <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
