@@ -33,3 +33,4 @@ bin
 
 # Environment files
 *.env
+docker-compose.yaml.bak
