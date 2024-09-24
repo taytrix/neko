@@ -20,12 +20,6 @@
   <script lang="ts">
   import { Vue, Component, Prop } from 'vue-property-decorator'
   
-  // Import custom avatar images
-  import tayAvatar from '@/assets/images/avatars/tay.jpg'
-  import vAvatar from '@/assets/images/avatars/v.jpg'
-  import oliveAvatar from '@/assets/images/avatars/olive.jpg'
-  import troyAvatar from '@/assets/images/avatars/troy.jpg'
-  
   @Component({
     name: 'avatar-custom',
   })
@@ -38,13 +32,13 @@
       const name = this.seed.toLowerCase()
       switch (name) {
         case 'tay':
-          return tayAvatar
+          return '@/assets/images/avatars/tay.jpg'
         case 'v':
-          return vAvatar
+          return '@/assets/images/avatars/v.jpg'
         case 'olive':
-          return oliveAvatar
+          return '@/assets/images/avatars/olive.jpg'
         case 'troy':
-          return troyAvatar
+          return '@/assets/images/avatars/troy.jpg'
         default:
           return null
       }
