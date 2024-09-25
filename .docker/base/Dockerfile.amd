@@ -58,12 +58,16 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends wget ca-certificates supervisor; \
     apt-get install -y --no-install-recommends pulseaudio dbus-x11 xserver-xorg-video-dummy; \
     apt-get install -y --no-install-recommends libcairo2 libxcb1 libxrandr2 libxv1 libopus0 libvpx6; \
+    # Remove Intel-specific drivers if present
+    apt-get remove -y intel-media-va-driver-non-free || true; \
     # Install mesa and VAAPI drivers for AMD
-    apt-get install -y --no-install-recommends mesa-va-drivers libva2 vainfo; \
+    apt-get install -y --no-install-recommends mesa-va-drivers vainfo libva2; \
     # Install GStreamer and VAAPI plugin
     apt-get install -y --no-install-recommends libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
                     gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-pulseaudio \
                     gstreamer1.0-vaapi; \
+    # Install Vulkan support tools
+    apt-get install -y --no-install-recommends vulkan-tools mesa-vulkan-drivers; \
     # Install fonts
     apt-get install -y --no-install-recommends \
         fonts-noto-color-emoji \
@@ -95,9 +99,9 @@ RUN set -eux; \
 # Copy config files
 COPY .docker/base/dbus /usr/bin/dbus
 COPY .docker/base/default.pa /etc/pulse/default.pa
-COPY .docker/base/intel/supervisord.conf /etc/neko/supervisord.conf
+COPY .docker/base/amd/supervisord.conf /etc/neko/supervisord.conf
 COPY .docker/base/xorg.conf /etc/neko/xorg.conf
-COPY .docker/base/intel/add-render-group.sh /usr/bin/add-render-group.sh
+COPY .docker/base/amd/add-render-group.sh /usr/bin/add-render-group.sh
 
 # Set default envs
 ENV USER=$USERNAME
