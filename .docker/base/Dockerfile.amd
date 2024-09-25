@@ -5,12 +5,13 @@ FROM golang:1.20-bullseye as server
 WORKDIR /src
 
 #
-# Install dependencies for building the server
+# install dependencies
 RUN set -eux; apt-get update; \
     apt-get install -y --no-install-recommends git cmake make libx11-dev libxrandr-dev libxtst-dev \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly; \
     #
-    # Install libclipboard
+    # install libclipboard
+    set -eux; \
     cd /tmp; \
     git clone --depth=1 https://github.com/jtanx/libclipboard; \
     cd libclipboard; \
@@ -19,13 +20,13 @@ RUN set -eux; apt-get update; \
     make install; \
     rm -rf /tmp/libclipboard; \
     #
-    # Clean up
+    # clean up
     apt-get clean -y; \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 #
-# Build server
-COPY server/ ./
+# build server
+COPY server/ .
 RUN ./build
 
 #
@@ -35,59 +36,52 @@ FROM node:18-bullseye-slim as client
 WORKDIR /src
 
 #
-# Install dependencies for building the client
+# install dependencies
 COPY client/package*.json ./
 RUN npm install
 
 #
-# Build client
-COPY client/ ./
+# build client
+COPY client/ .
 RUN npm run build
 
 #
 # STAGE 3: RUNTIME
 #
-FROM ubuntu:22.04
+FROM debian:bullseye-slim
 
 #
-# Avoid interactive prompts during installation
+# avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
 #
-# Set custom user
+# set custom user
 ARG USERNAME=neko
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-#
-# Install wget first
-#
-RUN apt-get update && \
-    apt-get install -y wget && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-#
-# Add non-free repo for AMD drivers
-#
-RUN wget https://repo.radeon.com/amdgpu-install/6.2.1/ubuntu/jammy/amdgpu-install_6.2.60201-1_all.deb && \
-    apt-get update && \
-    apt-get install -y ./amdgpu-install_6.2.60201-1_all.deb && \
-    rm -f amdgpu-install_6.2.60201-1_all.deb
-
-#
-# Install AMD drivers (user-space only) and other dependencies
-#
 RUN set -eux; \
-    apt-get update; \
-    amdgpu-install --usecase=graphics --no-dkms --no-32 -y; \
-    apt-get install -y --no-install-recommends ca-certificates supervisor pulseaudio dbus-x11 xserver-xorg-video-dummy; \
-    apt-get install -y --no-install-recommends libcairo2 libxcb1 libxrandr2 libxv1 libopus0; \
-    apt-get install -y --no-install-recommends libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
-                    gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
-                    gstreamer1.0-pulseaudio gstreamer1.0-vaapi; \
     #
-    # Install fonts
+    # add non-free repo for intel drivers
+    echo deb http://deb.debian.org/debian bullseye main contrib non-free > /etc/apt/sources.list; \
+    echo deb http://deb.debian.org/debian-security/ bullseye-security main contrib non-free >> /etc/apt/sources.list; \
+    echo deb http://deb.debian.org/debian bullseye-updates main contrib non-free >> /etc/apt/sources.list; \
+    apt-get update; \
+    #
+    # install dependencies
+    apt-get install -y --no-install-recommends wget ca-certificates supervisor; \
+    apt-get install -y --no-install-recommends pulseaudio dbus-x11 xserver-xorg-video-dummy; \
+    apt-get install -y --no-install-recommends libcairo2 libxcb1 libxrandr2 libxv1 libopus0 libvpx6; \
+    #
+    # intel driver + vaapi
+    apt-get install -y --no-install-recommends mesa-va-drivers libva2 vainfo; \
+    #
+    # gst + vaapi plugin
+    apt-get install -y --no-install-recommends libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+                    gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-pulseaudio \
+                    gstreamer1.0-vaapi; \
+    #
+    # install fonts
     apt-get install -y --no-install-recommends \
         # Google emojis
         fonts-noto-color-emoji \
@@ -98,7 +92,7 @@ RUN set -eux; \
         # Korean fonts
         fonts-wqy-microhei; \
     #
-    # Create a non-root user
+    # create a non-root user
     groupadd --gid $USER_GID $USERNAME; \
     useradd --uid $USER_UID --gid $USERNAME --shell /bin/bash --create-home $USERNAME; \
     adduser $USERNAME audio; \
@@ -110,7 +104,7 @@ RUN set -eux; \
     chmod 1777 /tmp/.X11-unix; \
     chown $USERNAME /tmp/.X11-unix/; \
     #
-    # Make directories for neko
+    # make directories for neko
     mkdir -p /etc/neko /var/www /var/log/neko \
         /tmp/runtime-$USERNAME \
         /home/$USERNAME/.config/pulse  \
@@ -119,20 +113,20 @@ RUN set -eux; \
     chown $USERNAME /var/log/neko/ /tmp/runtime-$USERNAME; \
     chown -R $USERNAME:$USERNAME /home/$USERNAME; \
     #
-    # Clean up
+    # clean up
     apt-get clean -y; \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 #
-# Copy configuration files
+# copy config files
 COPY .docker/base/dbus /usr/bin/dbus
 COPY .docker/base/default.pa /etc/pulse/default.pa
-COPY .docker/base/amd/supervisord.conf /etc/neko/supervisord.conf
+COPY .docker/base/intel/supervisord.conf /etc/neko/supervisord.conf
 COPY .docker/base/xorg.conf /etc/neko/xorg.conf
-COPY .docker/base/amd/add-render-group.sh /usr/bin/add-render-group.sh
+COPY .docker/base/intel/add-render-group.sh /usr/bin/add-render-group.sh
 
 #
-# Set default environment variables
+# set default envs
 ENV USER=$USERNAME
 ENV DISPLAY=:99.0
 ENV PULSE_SERVER=unix:/tmp/pulseaudio.socket
@@ -144,15 +138,13 @@ ENV NEKO_HWENC=VAAPI
 ENV RENDER_GID=
 
 #
-# Copy static files from previous stages
+# copy static files from previous stages
 COPY --from=server /src/bin/neko /usr/bin/neko
 COPY --from=client /src/dist/ /var/www
 
-#
-# Healthcheck
 HEALTHCHECK --interval=10s --timeout=5s --retries=8 \
     CMD wget -O - http://localhost:${NEKO_BIND#*:}/health || exit 1
 
 #
-# Run neko
+# run neko
 CMD ["/usr/bin/supervisord", "-c", "/etc/neko/supervisord.conf"]
