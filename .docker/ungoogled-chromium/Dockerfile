@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=taytrix/neko:base
+ARG BASE_IMAGE=taytrix/neko:amd-base
 FROM $BASE_IMAGE
 
 ARG API_URL="https://api.github.com/repos/macchrome/linchrome/releases/latest"
