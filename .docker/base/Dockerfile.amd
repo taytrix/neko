@@ -53,9 +53,13 @@ ARG USER_GID=$USER_UID
 
 RUN set -eux; \
     apt-get update; \
+    # Add AMD GPU repository
+    apt-get install -y software-properties-common; \
+    add-apt-repository ppa:oibaf/graphics-drivers; \
+    apt-get update; \
     # Install AMD firmware and dependencies
     apt-get install -y --no-install-recommends wget ca-certificates supervisor; \
-    apt-get install -y --no-install-recommends firmware-amd-graphics mesa-va-drivers libva2 vainfo; \
+    apt-get install -y --no-install-recommends mesa-va-drivers libva2 vainfo; \
     apt-get install -y --no-install-recommends pulseaudio dbus-x11 xserver-xorg-video-dummy; \
     apt-get install -y --no-install-recommends libcairo2 libxcb1 libxrandr2 libxv1 libopus0 libvpx6; \
     # Install GStreamer and VAAPI plugin
