@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=debian:bookworm-slim
+ARG BASE_IMAGE=debian:bullseye-slim
 FROM $BASE_IMAGE AS runtime
 
 #
