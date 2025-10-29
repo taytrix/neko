@@ -28,7 +28,7 @@ RUN set -eux; \
         gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
         gstreamer1.0-pulseaudio gstreamer1.0-omx; \
     #
-    # install libxcvt0 (not available in debian:bullseye)
+    # install libxcvt0 (not available in debian:bookworm)
     ARCH=$(dpkg --print-architecture); \
     wget http://ftp.de.debian.org/debian/pool/main/libx/libxcvt/libxcvt0_0.1.2-1_${ARCH}.deb; \
     apt-get install --no-install-recommends ./libxcvt0_0.1.2-1_${ARCH}.deb; \
