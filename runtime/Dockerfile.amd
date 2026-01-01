@@ -32,10 +32,11 @@ RUN set -eux; \
         # file chooser handler, clipboard, drop
         xdotool xclip libgtk-3-0 \
         #
-        # gst
+        # gst (includes gst-tools for debugging and cache management)
         gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
         gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
         gstreamer1.0-pulseaudio gstreamer1.0-vaapi \
+        gstreamer1.0-tools \
         #
         # libxcvt0 is available in Bookworm
         libxcvt0; \
@@ -90,7 +91,10 @@ COPY supervisord.conf /etc/neko/supervisord.conf
 COPY supervisord.dbus.conf /etc/neko/supervisord.dbus.conf
 COPY xorg.conf /etc/neko/xorg.conf
 COPY amd/add-render-group.sh /usr/bin/add-render-group.sh
+COPY amd/gst-cache-clear.sh /usr/bin/gst-cache-clear.sh
+RUN chmod +x /usr/bin/gst-cache-clear.sh
 COPY amd/supervisord.rendergroup.conf /etc/neko/supervisord/supervisord.rendergroup.conf
+COPY amd/supervisord.gstcache.conf /etc/neko/supervisord/supervisord.gstcache.conf
 
 #
 # copy runtime folders
