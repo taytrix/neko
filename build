@@ -308,14 +308,20 @@ fi
 prompt "Are you sure you want to build $BASE_IMAGE?"
 
 RUNTIME_DOCKERFILE="Dockerfile"
+XORG_DOCKERFILE="Dockerfile"
 if [ ! -z "$FLAVOR" ] && [ -f "runtime/Dockerfile.$FLAVOR" ]; then
   RUNTIME_DOCKERFILE="Dockerfile.$FLAVOR"
+  # AMD flavor needs Bookworm xorg-deps for X ABI 25 compatibility
+  if [ "$FLAVOR" == "amd" ] && [ -f "utils/xorg-deps/Dockerfile.bookworm" ]; then
+    XORG_DOCKERFILE="Dockerfile.bookworm"
+  fi
 fi
 
 log "Building base image: $BASE_IMAGE"
 docker run --rm -i \
   -v "$(pwd)":/src \
   -e "RUNTIME_DOCKERFILE=$RUNTIME_DOCKERFILE" \
+  -e "XORG_DOCKERFILE=$XORG_DOCKERFILE" \
   --workdir /src \
   --entrypoint go \
   golang:1.24-bullseye \

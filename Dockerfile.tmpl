@@ -2,7 +2,7 @@
 
 FROM ./server/ AS server
 FROM ./client/ AS client
-FROM ./utils/xorg-deps/ AS xorg-deps
+FROM ./utils/xorg-deps/$XORG_DOCKERFILE AS xorg-deps
 FROM ./runtime/$RUNTIME_DOCKERFILE AS runtime
 
 # tells neko-rooms which version of the API to use

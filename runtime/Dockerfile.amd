@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=debian:bullseye-slim
+ARG BASE_IMAGE=debian:bookworm-slim
 FROM $BASE_IMAGE AS runtime
 
 #
@@ -12,17 +12,17 @@ ARG USER_GID=$USER_UID
 ENV DEBIAN_FRONTEND=noninteractive
 RUN set -eux; \
     #
-    # add non-free repo for AMD firmware
-    echo deb http://deb.debian.org/debian bullseye main contrib non-free > /etc/apt/sources.list; \
-    echo deb http://deb.debian.org/debian-security/ bullseye-security main contrib non-free >> /etc/apt/sources.list; \
-    echo deb http://deb.debian.org/debian bullseye-updates main contrib non-free >> /etc/apt/sources.list; \
+    # add non-free-firmware repo for AMD firmware
+    echo "deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list; \
+    echo "deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware" >> /etc/apt/sources.list; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         wget ca-certificates supervisor \
         pulseaudio dbus-x11 xserver-xorg-video-dummy \
-        libcairo2 libxcb1 libxrandr2 libxv1 libopus0 libvpx6 \
+        libcairo2 libxcb1 libxrandr2 libxv1 libopus0 libvpx7 \
         #
-        # AMD driver + vaapi
+        # AMD driver + vaapi (Mesa 22.3+ for RDNA3 support)
         mesa-va-drivers libva2 vainfo \
         firmware-amd-graphics \
         #
@@ -35,13 +35,10 @@ RUN set -eux; \
         # gst
         gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
         gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
-        gstreamer1.0-pulseaudio gstreamer1.0-vaapi; \
-    #
-    # install libxcvt0 (not available in debian:bullseye)
-    ARCH=$(dpkg --print-architecture); \
-    wget http://ftp.de.debian.org/debian/pool/main/libx/libxcvt/libxcvt0_0.1.2-1_${ARCH}.deb; \
-    apt-get install --no-install-recommends ./libxcvt0_0.1.2-1_${ARCH}.deb; \
-    rm ./libxcvt0_0.1.2-1_${ARCH}.deb; \
+        gstreamer1.0-pulseaudio gstreamer1.0-vaapi \
+        #
+        # libxcvt0 is available in Bookworm
+        libxcvt0; \
     #
     # create a non-root user
     groupadd --gid $USER_GID $USERNAME; \
