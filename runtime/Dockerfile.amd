@@ -91,10 +91,9 @@ COPY supervisord.conf /etc/neko/supervisord.conf
 COPY supervisord.dbus.conf /etc/neko/supervisord.dbus.conf
 COPY xorg.conf /etc/neko/xorg.conf
 COPY amd/add-render-group.sh /usr/bin/add-render-group.sh
-COPY amd/gst-cache-clear.sh /usr/bin/gst-cache-clear.sh
-RUN chmod +x /usr/bin/gst-cache-clear.sh
+COPY amd/neko-wrapper.sh /usr/bin/neko-wrapper.sh
+RUN chmod +x /usr/bin/neko-wrapper.sh
 COPY amd/supervisord.rendergroup.conf /etc/neko/supervisord/supervisord.rendergroup.conf
-COPY amd/supervisord.gstcache.conf /etc/neko/supervisord/supervisord.gstcache.conf
 
 #
 # copy runtime folders

@@ -11,6 +11,13 @@ LABEL net.m1k1o.neko.api-version=3
 COPY --from=server /src/bin/plugins/ /etc/neko/plugins/
 COPY --from=server /src/bin/neko /usr/bin/neko
 COPY --from=client /src/dist/ /var/www
+
+# If a neko-wrapper exists (e.g., for AMD GStreamer cache fix), use it
+RUN if [ -f /usr/bin/neko-wrapper.sh ]; then \
+        mv /usr/bin/neko /usr/bin/neko-bin && \
+        mv /usr/bin/neko-wrapper.sh /usr/bin/neko && \
+        chmod +x /usr/bin/neko; \
+    fi
 COPY --from=xorg-deps /usr/local/lib/xorg/modules/drivers/dummy_drv.so /usr/lib/xorg/modules/drivers/dummy_drv.so
 COPY --from=xorg-deps /usr/local/lib/xorg/modules/input/neko_drv.so /usr/lib/xorg/modules/input/neko_drv.so
 
